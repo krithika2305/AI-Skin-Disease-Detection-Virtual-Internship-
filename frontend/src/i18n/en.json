@@ -1,0 +1,103 @@
+{
+  "navbar": {
+    "home": "Home",
+    "detect": "Detect",
+    "history": "History",
+    "recommendations": "Recommendations",
+    "about": "About",
+    "logout": "Logout",
+    "login": "Login",
+    "register": "Register",
+    "admin": "Admin"
+  },
+  "common": {
+    "analyze": "Analyze Now",
+    "analyzing": "Analyzing...",
+    "download_report": "Download Report",
+    "clear_history": "Clear History",
+    "remove": "Remove",
+    "upload_image": "Upload Image",
+    "analysis_results": "Analysis Results",
+    "confidence": "Confidence Level",
+    "back_to_home": "Back to Home",
+    "predicted_condition": "Predicted Condition",
+    "ai_recommendation": "AI Recommendation",
+    "system_check": "System Check"
+  },
+  "detect_page": {
+    "title": "Analyze Your Skin Photo",
+    "upload_text": "Click or drag your photo here",
+    "predict_btn": "Start AI Analysis",
+    "analyis_complete": "Analysis Complete",
+    "predicted_condition": "Predicted Condition",
+    "confidence": "Confidence Level",
+    "ai_recommendation": "AI Recommendation",
+    "error_title": "Detection Failed"
+  },
+  "howitworks": {
+    "title": "How It Works",
+    "subtitle": "Follow these 4 simple steps to check your skin.",
+    "step1_title": "Upload Photo",
+    "step1_desc": "Take a clear picture of the skin area and upload it.",
+    "step2_title": "AI Analysis",
+    "step2_desc": "Our smart AI checks the photo instantly.",
+    "step3_title": "Get Results",
+    "step3_desc": "See what the AI found and its confidence score.",
+    "step4_title": "Next Steps",
+    "step4_desc": "Learn what you can do next based on the results."
+  },
+  "recommendations_page": {
+    "title": "Expert Skin Care Advice",
+    "subtitle": "Trusted guidelines for maintaining healthy, dermatologically-sound skin.",
+    "sun_title": "Sun Protection",
+    "sun_desc": "Always wear sunscreen with at least SPF 30.",
+    "water_title": "Daily Hydration",
+    "water_desc": "Drink 8+ glasses of water and moisturize daily.",
+    "exam_title": "Regular Exams",
+    "exam_desc": "Perform monthly self-exams for any skin changes.",
+    "habits_title": "Healthy Habits",
+    "habits_desc": "Eat antioxidant-rich foods and get 8 hours of sleep.",
+    "nearby_title": "Skin Specialists Nearby",
+    "nearby_subtitle": "Top dermatological centers in your area.",
+    "view_map": "View on Map"
+  },
+  "predictions": {
+    "Actinic Keratoses": "Actinic Keratoses",
+    "Basal Cell Carcinoma": "Basal Cell Carcinoma",
+    "Benign Keratosis-like Lesions": "Benign Keratosis-like Lesions",
+    "Dermatofibroma": "Dermatofibroma",
+    "Melanoma": "Melanoma",
+    "Melanocytic Nevi": "Melanocytic Nevi",
+    "Vascular Lesions": "Vascular Lesions",
+    "Inconclusive": "Inconclusive",
+    "Unknown": "Unknown",
+    "Non-Skin Image Detected": "Non-Skin Image Detected"
+  },
+  "messages": {
+    "inconclusive_desc": "The image is not clear or the condition is uncertain. Please upload a high-quality image or consult a dermatologist.",
+    "unknown_desc": "This condition is not recognized by the model. Please consult a dermatologist.",
+    "disclaimer": "AI assessments are for informational purposes only. Please see a doctor.",
+    "feedback_title": "Your Feedback Matters",
+    "feedback_subtitle": "Help us improve our AI detection and services.",
+    "feedback_placeholder": "Share your experience or suggestions...",
+    "feedback_submit": "Submit Feedback",
+    "feedback_thankyou": "Thank You!",
+    "feedback_success": "Your feedback has been received."
+  },
+  "about_page": {
+    "title": "About Us",
+    "main": "Our advanced AI platform provides a simple and fast way to check your skin and understand your health instantly from home.",
+    "sec1_title": "Smart AI Detection",
+    "sec1_item1": "Our system uses powerful AI to scan your photos.",
+    "sec1_item2": "It identifies common skin issues with high accuracy.",
+    "sec1_item3": "Get professional insights without the long wait.",
+    "sec2_title": "Fast & Easy Process",
+    "sec2_item1": "Just upload a clear photo of the skin area.",
+    "sec2_item2": "Our AI analyzes the image in just a few seconds.",
+    "sec2_item3": "Receive immediate feedback on what to do next.",
+    "sec3_title": "Secure & Private Care",
+    "sec3_item1": "Your personal photos and data stay completely safe.",
+    "sec3_item2": "We use high-level security to protect your privacy.",
+    "sec3_item3": "Check your health from the comfort of your home."
+  }
+}
