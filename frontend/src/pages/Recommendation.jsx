@@ -62,7 +62,7 @@ export default function Recommendation() {
 
         try {
             await submitFeedback({
-                feedback: feedback,
+                text: feedback,
                 rating: rating,
                 username: username
             });

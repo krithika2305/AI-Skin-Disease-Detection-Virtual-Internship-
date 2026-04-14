@@ -17,7 +17,7 @@ FEEDBACK_FILE = os.path.join(os.path.dirname(__file__), 'feedback.json')
 PREDICTIONS_FILE = os.path.join(os.path.dirname(__file__), 'predictions.json')
 
 # Load Model
-MODEL_PATH = os.path.join(os.path.dirname(__file__), '../models/skin_disease_mobilenetv2.h5')
+MODEL_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../models/skin_disease_mobilenetv2.h5'))
 model = None
 
 try:
@@ -87,34 +87,59 @@ def get_doctors():
     filtered = [d for d in DOCTORS if d['city'] == city]
     return jsonify(filtered)
 
+# Enhanced Industry Mapping
+CLASS_DETAILS = {
+    'Actinic Keratoses': {'risk': 'High', 'key': 'Actinic_Keratoses'},
+    'Basal Cell Carcinoma': {'risk': 'High', 'key': 'Basal_Cell_Carcinoma'},
+    'Benign Keratosis-like Lesions': {'risk': 'Low', 'key': 'Benign_Keratosis-like_Lesions'},
+    'Dermatofibroma': {'risk': 'Low', 'key': 'Dermatofibroma'},
+    'Melanoma': {'risk': 'High', 'key': 'Melanoma'},
+    'Melanocytic Nevi': {'risk': 'Medium', 'key': 'Melanocytic_Nevi'},
+    'Vascular Lesions': {'risk': 'Low', 'key': 'Vascular_Lesions'},
+    'Unknown': {'risk': 'Uncertain', 'key': 'Inconclusive'}
+}
+
 @app.route('/predict', methods=['POST'])
 def predict():
     if 'file' not in request.files: return jsonify({"error": "No file"}), 400
     file = request.files['file']
-    if not model: return jsonify({"prediction": "Demo Mode", "confidence": 0.9, "recommendation": "Model missing"})
+    if not model: return jsonify({"prediction": "Demo Mode", "confidence": 0.9, "status": "demo"})
 
     try:
         processed_image, message = prepare_image(file)
         if processed_image is None:
-            log_prediction({"prediction": "Non-Skin", "confidence": 0, "status": "failed"})
-            return jsonify({"prediction": "Non-Skin Image Detected", "recommendation": message}), 422
+            return jsonify({"error": "Preprocessing error", "recommendation": message}), 422
 
         pred_array = model.predict(processed_image)
         class_idx = np.argmax(pred_array[0])
         confidence = float(np.max(pred_array[0]))
 
-        if confidence < 0.60:
-            result = {"prediction": "Inconclusive", "confidence": confidence, "status": "low_confidence"}
-            log_prediction(result)
-            return jsonify({**result, "recommendation": "Model is not confident. " + RECOMMENDATIONS['Unknown']})
+        # Confidence handling logic
+        if confidence < 0.40:
+            status = "uncertain"
+            label = "Low Confidence / Uncertain"
+            predicted_class = "Unknown"
+        elif confidence < 0.70:
+            status = "medium"
+            label = "Moderate Confidence"
+            predicted_class = CLASSES.get(class_idx, "Unknown")
+        else:
+            status = "high"
+            label = "High Confidence Analysis"
+            predicted_class = CLASSES.get(class_idx, "Unknown")
 
-        predicted_class = CLASSES.get(class_idx, "Unknown")
+        details = CLASS_DETAILS.get(predicted_class, CLASS_DETAILS['Unknown'])
+        
         result = {
             "prediction": predicted_class,
             "confidence": confidence,
-            "recommendation": RECOMMENDATIONS.get(predicted_class),
-            "status": "success"
+            "confidence_label": label,
+            "risk_level": details['risk'],
+            "class_key": details['key'],
+            "recommendation": RECOMMENDATIONS.get(predicted_class, RECOMMENDATIONS['Unknown']),
+            "status": status
         }
+        
         log_prediction(result)
         return jsonify(result)
     except Exception as e:
@@ -132,12 +157,24 @@ def register():
 @app.route('/login', methods=['POST'])
 def login():
     data = request.json
-    if data.get('email') == 'admin' and data.get('password') == 'admin123':
-        return jsonify({"username": "admin", "role": "admin"}), 200
+    login_id = data.get('email', '').strip().lower()
+    password = data.get('password', '')
+
+    if login_id == 'admin' and password == 'admin123':
+        return jsonify({"username": "admin", "role": "admin", "email": "admin@derma.ai"}), 200
+
     users = load_json(USERS_FILE, {})
     for uname, udata in users.items():
-        if udata.get('email') == data.get('email') and udata.get('password') == data.get('password'):
-            return jsonify({"username": uname, "role": "user"}), 200
+        stored_email = udata.get('email', '').strip().lower()
+        stored_uname = uname.strip().lower()
+        
+        if (stored_email == login_id or stored_uname == login_id) and udata.get('password') == password:
+            return jsonify({
+                "username": uname, 
+                "role": "user", 
+                "email": udata.get('email')
+            }), 200
+
     return jsonify({"error": "Invalid credentials"}), 401
 
 @app.route('/feedback', methods=['POST'])
@@ -151,6 +188,16 @@ def submit_feedback():
 @app.route('/admin/feedback', methods=['GET'])
 def get_feedback():
     return jsonify(load_json(FEEDBACK_FILE, []))
+
+@app.route('/admin/feedback/delete', methods=['POST'])
+def delete_feedback():
+    date = request.json.get('date')
+    feedbacks = load_json(FEEDBACK_FILE, [])
+    new_feedbacks = [f for f in feedbacks if f.get('date') != date]
+    if len(new_feedbacks) < len(feedbacks):
+        save_json(FEEDBACK_FILE, new_feedbacks)
+        return jsonify({"message": "Deleted"}), 200
+    return jsonify({"error": "Not found"}), 404
 
 @app.route('/admin/stats', methods=['GET'])
 def get_stats():

@@ -28,11 +28,13 @@
     "title": "Analyze Your Skin Photo",
     "upload_text": "Click or drag your photo here",
     "predict_btn": "Start AI Analysis",
-    "analyis_complete": "Analysis Complete",
-    "predicted_condition": "Predicted Condition",
-    "confidence": "Confidence Level",
-    "ai_recommendation": "AI Recommendation",
-    "error_title": "Detection Failed"
+    "analyis_complete": "Analysis Report",
+    "predicted_condition": "Analysis Result",
+    "confidence": "Probability Score",
+    "ai_recommendation": "Management Suggestion",
+    "error_title": "Analysis Unavailable",
+    "risk_level": "Risk Categorization",
+    "explanation_title": "AI Logic Explanation"
   },
   "howitworks": {
     "title": "How It Works",
@@ -73,10 +75,27 @@
     "Unknown": "Unknown",
     "Non-Skin Image Detected": "Non-Skin Image Detected"
   },
+  "risk_levels": {
+    "High": "High Risk (Requires Urgent Medical Attention)",
+    "Medium": "Medium Risk (Monitor closely / Consult Professional)",
+    "Low": "Low Risk (Likely Benign / Routine Check)",
+    "Uncertain": "Uncertain (Inconclusive Data)"
+  },
+  "explanations": {
+    "Actinic_Keratoses": "The model identified textures consistent with pre-cancerous solar damage, often characterized by scaly or crusty patches.",
+    "Basal_Cell_Carcinoma": "The AI detected patterns associated with common basal-layer anomalies, which typically require clinical removal.",
+    "Benign_Keratosis-like_Lesions": "The analysis suggests a non-cancerous growth pattern typical of aging or common skin plaques.",
+    "Dermatofibroma": "Visual patterns indicate a solid, deep-seated benign nodule, usually harmless.",
+    "Melanoma": "Urgent: The model recognized irregular pigmentation patterns strongly associated with malignant growths.",
+    "Melanocytic_Nevi": "This appears to be a standard mole pattern. However, changes in size or color should be medically monitored.",
+    "Vascular_Lesions": "The AI recognized blood vessel clusters, which are typically aesthetic concerns rather than pathological.",
+    "Inconclusive": "The system could not find a clear match due to lighting, hair coverage, or a rare condition. A professional physical exam is necessary.",
+    "Normal_Skin": "No significant pathological patterns were prioritized by the AI in this image area."
+  },
   "messages": {
-    "inconclusive_desc": "The image is not clear or the condition is uncertain. Please upload a high-quality image or consult a dermatologist.",
+    "inconclusive_desc": "The analysis results are uncertain. This could be due to a normal skin reading or image quality issues.",
     "unknown_desc": "This condition is not recognized by the model. Please consult a dermatologist.",
-    "disclaimer": "AI assessments are for informational purposes only. Please see a doctor.",
+    "disclaimer": "IMPORTANT: This AI tool is for educational/analytical assistance ONLY. It is not a medical diagnosis. Always seek the advice of your physician.",
     "feedback_title": "Your Feedback Matters",
     "feedback_subtitle": "Help us improve our AI detection and services.",
     "feedback_placeholder": "Share your experience or suggestions...",

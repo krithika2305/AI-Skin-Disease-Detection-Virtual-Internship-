@@ -81,3 +81,17 @@ export const askChatbot = async (message) => {
         throw error;
     }
 };
+
+export const deleteFeedback = async (date) => {
+    try {
+        const response = await fetch(`${API_URL}/admin/feedback/delete`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ date }),
+        });
+        return await response.json();
+    } catch (error) {
+        console.error("Delete Feedback Error:", error);
+        throw error;
+    }
+};

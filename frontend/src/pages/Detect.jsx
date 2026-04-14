@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, AlertCircle, CheckCircle2, RefreshCw, ChevronRight, User, Phone, MapPin } from 'lucide-react';
+import { Upload, AlertCircle, CheckCircle2, RefreshCw, ChevronRight, User, Phone, MapPin, Cpu } from 'lucide-react';
 import { uploadImage, getDoctors } from '../services/api';
 import { useLanguage } from '../LanguageContext';
 
@@ -37,14 +37,20 @@ export default function Detect() {
             const newResult = {
                 prediction: data.prediction,
                 confidence: (data.confidence * 100).toFixed(1),
+                confidence_label: data.confidence_label,
+                risk_level: data.risk_level,
+                class_key: data.class_key,
+                status: data.status,
                 recommendation: data.recommendation
             };
             setResult(newResult);
 
             // Save to history locally
-            const history = JSON.parse(localStorage.getItem('detectionHistory') || '[]');
-            history.unshift({ ...newResult, imageName: selectedImage.name, id: Date.now() });
-            localStorage.setItem('detectionHistory', JSON.stringify(history));
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const historyKey = user.username ? `detectionHistory_${user.username}` : 'detectionHistory';
+            const history = JSON.parse(localStorage.getItem(historyKey) || '[]');
+            history.unshift({ ...newResult, date: new Date().toISOString(), imageName: selectedImage.name, id: Date.now() });
+            localStorage.setItem(historyKey, JSON.stringify(history));
         } catch (err) {
             setError(err.recommendation || t('messages.unknown_desc'));
         } finally {
@@ -107,27 +113,66 @@ export default function Detect() {
                                 ) : (
                                     <>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
-                                            <CheckCircle2 color="var(--primary)" />
-                                            <span style={{ fontWeight: 700, color: 'var(--primary)', letterSpacing: '1px' }}>{t('detect_page.analyis_complete')}</span>
+                                            <CheckCircle2 color="#22d3ee" />
+                                            <span style={{ fontWeight: 700, color: '#22d3ee', letterSpacing: '1px', textTransform: 'uppercase' }}>{t('detect_page.analyis_complete')}</span>
                                         </div>
-                                        <h3 style={{ fontSize: '0.9rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>{t('detect_page.predicted_condition')}</h3>
-                                        <h2 style={{ fontSize: '2rem', marginBottom: '1.5rem', color: 'white' }}>{t('classes.' + result.prediction.replace(/ /g, '_')) || result.prediction}</h2>
+
+                                        <h3 style={{ fontSize: '0.85rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.5rem', fontWeight: 600 }}>{t('detect_page.predicted_condition')}</h3>
+                                        <h2 style={{ fontSize: '2.2rem', marginBottom: '1.5rem', color: 'white', fontWeight: 800 }}>{t('predictions.' + result.prediction) || result.prediction}</h2>
                                         
+                                        {/* Risk Level Badge */}
+                                        <div style={{ 
+                                            display: 'inline-block', 
+                                            padding: '0.5rem 1rem', 
+                                            borderRadius: '8px', 
+                                            marginBottom: '2rem',
+                                            background: result.risk_level === 'High' ? 'rgba(239, 68, 68, 0.2)' : result.risk_level === 'Medium' ? 'rgba(245, 158, 11, 0.2)' : 'rgba(34, 211, 238, 0.2)',
+                                            border: `1px solid ${result.risk_level === 'High' ? '#ef4444' : result.risk_level === 'Medium' ? '#f59e0b' : '#22d3ee'}`,
+                                            color: result.risk_level === 'High' ? '#fca5a5' : result.risk_level === 'Medium' ? '#fcd34d' : '#22d3ee'
+                                        }}>
+                                            <span style={{ fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', marginRight: '8px' }}>{t('detect_page.risk_level')}:</span>
+                                            <span style={{ fontWeight: 600 }}>{t('risk_levels.' + (result.risk_level || 'Uncertain'))}</span>
+                                        </div>
+
                                         <div style={{ marginBottom: '2rem' }}>
                                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                                                <span>{t('detect_page.confidence')}</span>
-                                                <span style={{ fontWeight: 700, color: 'var(--primary)' }}>{result.confidence}%</span>
+                                                <span>{t('detect_page.confidence')} ({result.confidence_label})</span>
+                                                <span style={{ fontWeight: 700, color: '#22d3ee' }}>{result.confidence}%</span>
                                             </div>
                                             <div style={{ height: '8px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', overflow: 'hidden' }}>
-                                                <motion.div initial={{ width: 0 }} animate={{ width: `${result.confidence}%` }} style={{ height: '100%', background: 'var(--primary)' }} />
+                                                <motion.div 
+                                                    initial={{ width: 0 }} 
+                                                    animate={{ width: `${result.confidence}%` }} 
+                                                    style={{ 
+                                                        height: '100%', 
+                                                        background: result.status === 'high' ? '#10b981' : result.status === 'medium' ? '#f59e0b' : '#3b82f6' 
+                                                    }} 
+                                                />
                                             </div>
                                         </div>
 
-                                        <div style={{ background: 'rgba(255,255,255,0.03)', padding: '1.5rem', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                                            <h4 style={{ marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                                <AlertCircle size={16} color="var(--primary)" /> {t('detect_page.ai_recommendation')}
-                                            </h4>
-                                            <p style={{ fontSize: '0.95rem', color: 'var(--text-muted)', lineHeight: '1.5' }}>{t('recommendations.' + result.prediction.replace(/ /g, '_')) || result.recommendation}</p>
+                                        <div style={{ display: 'grid', gap: '1.5rem' }}>
+                                            <div style={{ background: 'rgba(255,255,255,0.03)', padding: '1.5rem', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                                <h4 style={{ marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#22d3ee' }}>
+                                                    <Cpu size={16} /> {t('detect_page.explanation_title')}
+                                                </h4>
+                                                <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', lineHeight: '1.6', fontStyle: 'italic' }}>
+                                                    {t('explanations.' + (result.class_key || 'Inconclusive'))}
+                                                </p>
+                                            </div>
+
+                                            <div style={{ background: 'rgba(34, 211, 238, 0.05)', padding: '1.5rem', borderRadius: '16px', border: '1px solid rgba(34, 211, 238, 0.1)' }}>
+                                                <h4 style={{ marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                    <AlertCircle size={16} color="#22d3ee" /> {t('detect_page.ai_recommendation')}
+                                                </h4>
+                                                <p style={{ fontSize: '0.95rem', color: 'var(--text-muted)', lineHeight: '1.5' }}>{t('recommendations.' + result.prediction.replace(/ /g, '_')) || result.recommendation}</p>
+                                            </div>
+                                        </div>
+
+                                        <div style={{ marginTop: '2rem', padding: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                                            <p style={{ fontSize: '0.75rem', color: '#ef4444', textAlign: 'center', fontWeight: 600, lineHeight: 1.4 }}>
+                                                ⚠️ {t('messages.disclaimer')}
+                                            </p>
                                         </div>
 
                                         {/* Doctor Recommendation Section (NEW) */}

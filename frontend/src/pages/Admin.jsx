@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import {
-    Users, MessageSquare, Star, BarChart2, Shield, LogIn, LogOut,
+import { Trash2, Users, MessageSquare, Star, BarChart2, Shield, LogIn, LogOut,
     Activity, Clipboard, TrendingUp
 } from 'lucide-react';
-import { getAdminStats, getAllFeedback } from '../services/api';
+import { getAdminStats, getAllFeedback, deleteFeedback } from '../services/api';
 
 export default function Admin() {
     const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
@@ -47,6 +46,17 @@ export default function Admin() {
             loadData();
         } else {
             setLoginError('Invalid Credentials');
+        }
+    };
+
+    const handleDeleteFeedback = async (date) => {
+        if (window.confirm('Are you sure you want to delete this feedback?')) {
+            try {
+                await deleteFeedback(date);
+                loadData(); // Refresh list
+            } catch (err) {
+                alert('Failed to delete feedback');
+            }
         }
     };
 
@@ -101,7 +111,7 @@ export default function Admin() {
                 ) : (
                     <div style={{ display: 'grid', gap: '2rem' }}>
                         {activeSection === 'dashboard' && <Overview stats={stats} feedback={feedback} />}
-                        {activeSection === 'feedback' && <FeedbackTable feedback={feedback} />}
+                        {activeSection === 'feedback' && <FeedbackTable feedback={feedback} onDelete={handleDeleteFeedback} />}
                         {activeSection === 'stats' && <DiseaseStats stats={stats} />}
                     </div>
                 )}
@@ -142,7 +152,7 @@ function Overview({ stats, feedback }) {
                             <span style={{ fontWeight: 600 }}>{f.username}</span>
                             <span style={{ color: '#fbbf24' }}>{'★'.repeat(f.rating || 0)}</span>
                         </div>
-                        <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>{f.text}</p>
+                        <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>{f.text || f.feedback}</p>
                     </div>
                 ))}
             </div>
@@ -173,7 +183,7 @@ function DiseaseStats({ stats }) {
     );
 }
 
-function FeedbackTable({ feedback }) {
+function FeedbackTable({ feedback, onDelete }) {
     return (
         <div className="glass-panel" style={{ overflowX: 'auto' }}>
             <table className="admin-table" style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
@@ -183,6 +193,7 @@ function FeedbackTable({ feedback }) {
                         <th style={{ padding: '1rem' }}>Rating</th>
                         <th style={{ padding: '1rem' }}>Message</th>
                         <th style={{ padding: '1rem' }}>Date</th>
+                        <th style={{ padding: '1rem' }}>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -190,8 +201,29 @@ function FeedbackTable({ feedback }) {
                         <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.02)' }}>
                             <td style={{ padding: '1rem', fontWeight: 600 }}>{f.username}</td>
                             <td style={{ padding: '1rem', color: '#fbbf24' }}>{'★'.repeat(f.rating || 0)}</td>
-                            <td style={{ padding: '1rem', color: 'var(--text-muted)', fontSize: '0.85rem' }}>{f.text}</td>
+                            <td style={{ padding: '1rem', color: 'var(--text-muted)', fontSize: '0.85rem' }}>{f.text || f.feedback}</td>
                             <td style={{ padding: '1rem', opacity: 0.6, fontSize: '0.8rem' }}>{new Date(f.date).toLocaleDateString()}</td>
+                            <td style={{ padding: '1rem' }}>
+                                <button
+                                    onClick={() => onDelete(f.date)}
+                                    style={{
+                                        background: 'transparent',
+                                        border: 'none',
+                                        color: '#ef4444',
+                                        cursor: 'pointer',
+                                        padding: '0.5rem',
+                                        borderRadius: '8px',
+                                        transition: '0.2s',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center'
+                                    }}
+                                    onMouseOver={(e) => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'}
+                                    onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
+                                >
+                                    <Trash2 size={16} />
+                                </button>
+                            </td>
                         </tr>
                     ))}
                 </tbody>

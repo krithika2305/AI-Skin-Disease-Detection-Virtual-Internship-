@@ -8,20 +8,26 @@ export default function History() {
     const [history, setHistory] = useState([]);
 
     useEffect(() => {
-        const stored = JSON.parse(localStorage.getItem('detectionHistory') || '[]');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const historyKey = user.username ? `detectionHistory_${user.username}` : 'detectionHistory';
+        const stored = JSON.parse(localStorage.getItem(historyKey) || '[]');
         setHistory(stored);
     }, []);
 
     const clearHistory = () => {
         if (window.confirm(t('common.clear_history') + '?')) {
-            localStorage.removeItem('detectionHistory');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const historyKey = user.username ? `detectionHistory_${user.username}` : 'detectionHistory';
+            localStorage.removeItem(historyKey);
             setHistory([]);
         }
     };
 
     const deleteItem = (id) => {
         const updatedHistory = history.filter(item => item.id !== id);
-        localStorage.setItem('detectionHistory', JSON.stringify(updatedHistory));
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const historyKey = user.username ? `detectionHistory_${user.username}` : 'detectionHistory';
+        localStorage.setItem(historyKey, JSON.stringify(updatedHistory));
         setHistory(updatedHistory);
     };
 

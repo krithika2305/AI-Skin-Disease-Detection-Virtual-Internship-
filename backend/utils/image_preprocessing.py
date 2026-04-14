@@ -77,7 +77,7 @@ def prepare_image(file_storage):
         img_array = np.expand_dims(img_array, axis=0)
         
         # Preprocess input (Assuming MobileNetV2: [-1, 1])
-        img_array = (img_array.astype(np.float32) / 127.5) - 1.0
+        img_array = img_array.astype(np.float32) / 255.0
         
         return img_array, "Success"
     except Exception as e:
